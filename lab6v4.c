@@ -1,5 +1,4 @@
 #include "header.h"
-int emptyCount = 0;
 int askNY()
 {
     printf("Введите Д, если выбираете вариант да\n");
@@ -31,7 +30,7 @@ typedef struct sthotel
     int floors;
     stroom room[1000];
     stguests guests[1000];
-    int roomCount, guestsCount;
+    int roomCount, guestsCount, emptyCount;
 } sthotel;
 void clearConsoleLine()
 {
@@ -103,7 +102,7 @@ int addRooms(sthotel *hotel)
                     for (j = 0; j < hotel->roomCount; j++)
                         if (temp == hotel->room[j].number)
                             temp = err;
-                    if (temp == err || temp <= 0)
+                    if (temp == err || temp <= 0 || temp >= 10000)
                     {
                         p--;
                         printf("Неподходящий номер комнаты\n");
@@ -187,7 +186,6 @@ int addRooms(sthotel *hotel)
                     printf("Введите класс комнаты(к примеру обычный класс, полулюкс, люкс,королевский номер): ");
                     fflush(stdin);
                     gets(tempS);
-                    //scanf("%s", tempS);
                     if (hotel->room[i].class[0] != '\0')
                     {
                         printf("\nВы уверены что хотите изменить класс комнаты?\n");
@@ -226,7 +224,7 @@ int addRooms(sthotel *hotel)
                     printf("Введите количество людей на которое рассчитана комната: ");
                     scanf("%s", tempS);
                     temp = stod(tempS);
-                    if (temp == err || temp <= 0)
+                    if (temp == err || temp <= 0 || temp >= 100)
                     {
                         p--;
                         printf("Неподходящее количество людей\n");
@@ -302,7 +300,7 @@ int addRooms(sthotel *hotel)
             if (askNY())
             {
                 hotel->roomCount++;
-                emptyCount += hotel->room[i].peoples;
+                hotel->emptyCount += hotel->room[i].peoples;
                 printf("Комната успешно добавлена в гостиницу\n");
             }
             else
@@ -321,6 +319,7 @@ void clearHotel(sthotel *hotel)
     hotel->floors = 0;
     hotel->roomCount = 0;
     hotel->guestsCount = 0;
+    hotel->emptyCount = 0;
     int i;
     for (i = 0; i < 1000; i++)
     {
@@ -388,7 +387,7 @@ void delLast(char *str)
 }
 void LoadHotel(sthotel *hotel, FILE *fp1)
 {
-    emptyCount = 0;
+    hotel->emptyCount = 0;
     fgets(hotel->name, 254, fp1);
     int i;
     delLast(hotel->name);
@@ -398,7 +397,7 @@ void LoadHotel(sthotel *hotel, FILE *fp1)
         fgets(hotel->room[i].class, 254, fp1);
         delLast(hotel->room[i].class);
         fscanf(fp1, "%d %d %d %d %d\n", &hotel->room[i].cost, &hotel->room[i].floor, &hotel->room[i].number, &hotel->room[i].peoples, &hotel->room[i].empty);
-        emptyCount += hotel->room[i].peoples;
+        hotel->emptyCount += hotel->room[i].peoples;
     }
     fclose(fp1);
 }
@@ -420,12 +419,12 @@ void LoadGuests(sthotel *hotel, FILE *fp2)
         fgets(hotel->guests[i].outDate, 254, fp2);
         delLast(hotel->guests[i].outDate);
         fscanf(fp2, "%d\n", &hotel->guests[i].posRoom);
-        emptyCount--;
+        hotel->emptyCount--;
     }
 }
 void addGuest(sthotel *hotel)
 {
-    if (emptyCount == 0)
+    if (hotel->emptyCount == 0)
     {
         printf("Все комнаты заняты\n");
         return;
@@ -485,7 +484,6 @@ void addGuest(sthotel *hotel)
                     printf("Введите Фамилию Имя Отчество через пробел: ");
                     fflush(stdin);
                     gets(tempS);
-                    //scanf("%s", tempS);
                     if (hotel->guests[i].FIO[0] != '\0')
                     {
                         printf("\nВы уверены что хотите изменить ФИО?\n");
@@ -521,13 +519,12 @@ void addGuest(sthotel *hotel)
                             break;
                         }
                     }
-                    printf("Введите серийный номер пасспорта: ");
+                    printf("Введите серийный номер паспорта: ");
                     fflush(stdin);
                     gets(tempS);
-                    //scanf("%s", tempS);
                     if (hotel->guests[i].passport[0] != '\0')
                     {
-                        printf("\nВы уверены что хотите изменить пасспорт?\n");
+                        printf("\nВы уверены что хотите изменить паспорт?\n");
                         if (askNY())
                         {
                             strcpy(hotel->guests[i].passport, tempS);
@@ -563,7 +560,6 @@ void addGuest(sthotel *hotel)
                     printf("Введите номер телефона клиента: ");
                     fflush(stdin);
                     gets(tempS);
-                    //scanf("%s", tempS);
                     if (hotel->guests[i].phone[0] != '\0')
                     {
                         printf("\nВы уверены что хотите изменить номер телефона?\n");
@@ -640,7 +636,6 @@ void addGuest(sthotel *hotel)
                     printf("Введите дату выселения: ");
                     fflush(stdin);
                     gets(tempS);
-                    //scanf("%s", tempS);
                     if (hotel->guests[i].outDate[0] != '\0')
                     {
                         printf("\nВы уверены что хотите изменить дату выселения?\n");
@@ -735,7 +730,7 @@ void addGuest(sthotel *hotel)
             if (askNY())
             {
                 hotel->guestsCount++;
-                emptyCount--;
+                hotel->emptyCount--;
                 printf("Гость успешно заселён в гостиницу\n");
             }
             else
@@ -759,7 +754,7 @@ void init(sthotel *hotel)
         printf("Введите количество этажей в Вашей гостинице: ");
         scanf("%s", tempS);
         hotel->floors = stod(tempS);
-        if (hotel->floors == err || hotel->floors <= 0)
+        if (hotel->floors == err || hotel->floors <= 0 || hotel->floors >= 1000)
             printf("Неподходящее количество этажей\n");
         else
             break;
@@ -1071,7 +1066,7 @@ void delGuest(sthotel *hotel)
             if (askNY())
             {
                 int i = minp;
-                emptyCount++;
+                hotel->emptyCount++;
                 hotel->room[hotel->guests[i].posRoom].empty++;
                 strcpy(hotel->guests[i].FIO, "");
                 strcpy(hotel->guests[i].passport, "");
@@ -1150,7 +1145,7 @@ void editRooms(sthotel *hotel, int i)
                             temp = err;
                             break;
                         }
-                    if (temp == err || temp <= 0)
+                    if (temp == err || temp <= 0 || temp >= 10000)
                     {
                         p--;
                         printf("Неподходящий номер комнаты\n");
@@ -1255,7 +1250,7 @@ void editRooms(sthotel *hotel, int i)
                     printf("Введите новое количество людей на которое рассчитана комната: ");
                     scanf("%s", tempS);
                     temp = stod(tempS);
-                    if (temp == err || temp <= 0 || hotel->room[i].peoples - hotel->room[i].empty > temp)
+                    if (temp == err || temp <= 0 || hotel->room[i].peoples - hotel->room[i].empty > temp || temp >= 100)
                     {
                         p--;
                         printf("Неподходящее количество людей\n");
@@ -1264,7 +1259,7 @@ void editRooms(sthotel *hotel, int i)
                     printf("\nВы уверены что хотите изменить количество людей?\n");
                     if (askNY())
                     {
-                        emptyCount += temp - hotel->room[i].peoples;
+                        hotel->emptyCount += temp - hotel->room[i].peoples;
                         hotel->room[i].empty += temp - hotel->room[i].peoples;
                         hotel->room[i].peoples = temp;
                         flag = false;
@@ -1643,16 +1638,15 @@ void editGuest(sthotel *hotel, int i)
                             break;
                         }
                     }
-                    printf("Введите серийный номер пасспорта: ");
+                    printf("Введите серийный номер паспорта: ");
                     fflush(stdin);
                     gets(tempS);
-                    //scanf("%s", tempS);
                     if (tempS[0] == '\0')
                     {
                         p--;
                         continue;
                     }
-                    printf("\nВы уверены что хотите изменить пасспорт?\n");
+                    printf("\nВы уверены что хотите изменить паспорт?\n");
                     if (askNY())
                     {
                         strcpy(hotel->guests[i].passport, tempS);
@@ -1949,8 +1943,6 @@ void editHotel(sthotel *hotel)
             break;
     }
 }
-// редактирование отеля
-// ред гостя
 int main()
 {
     setlocale(LC_ALL, "ru_RU.CP866");
@@ -1959,11 +1951,12 @@ int main()
     keybd_event(VK_RETURN, 0x1c, KEYEVENTF_KEYUP, 0);
     keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
     FILE *fp1 = fopen("hotel.txt", "r");
+    FILE *fp2 = fopen("guests.txt", "r");
     sthotel hotel;
     clearHotel(&hotel);
     printf("Не забудьте поменять раскладку на русскую.\n");
     int saved = true;
-    if (fp1 == NULL)
+    if (fp1 == NULL && fp2 == NULL)
     {
         printf("\nПохоже на то, что это Ваш первый запуск.\n"
                "Хотите ли Вы инициализировать данные о гостинице?\n");
@@ -1980,18 +1973,17 @@ int main()
         {
             printf("Как наберётесь смелости возвращайтесь.\n");
             fclose(fp1);
+            fclose(fp2);
+            getch();
             return 0;
         }
     }
     else
+    {
         LoadHotel(&hotel, fp1);
-
-    fclose(fp1);
-    FILE *fp2 = fopen("guests.txt", "r");
-    if (fp2 == NULL)
-        fp2 = fopen("guests.txt", "w");
-    else
         LoadGuests(&hotel, fp2);
+    }
+    fclose(fp1);
     fclose(fp2);
     while (true)
     {
@@ -2016,7 +2008,7 @@ int main()
         else if (c == '1')
         {
             printf("Ваша великолепная %d этажная гостиница '%s' имеет %d комнат(%d свободных мест):\n",
-                   hotel.floors, hotel.name, hotel.roomCount, emptyCount);
+                   hotel.floors, hotel.name, hotel.roomCount, hotel.emptyCount);
             int i;
             for (i = 0; i < hotel.roomCount; i++)
                 printf("%d. На %d этаже комната номер %d класса '%s' стоимостью %d у.е. рассчитанную на %d человек(%d мест свободно)\n",
@@ -2046,11 +2038,6 @@ int main()
             editHotel(&hotel);
             saved = false;
         }
-        // else if (c == '6')
-        // {
-        //     //editHotel(&hotel);
-        //     saved = false;
-        // }
         else if (c == '6')
         {
             delGuest(&hotel);
