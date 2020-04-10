@@ -1,2 +1,2 @@
 all:
-	gcc lab6v4.c MyLib.c -o a
+	gcc -std=c89 lab6v4.c MyLib.c -o a
