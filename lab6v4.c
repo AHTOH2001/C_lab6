@@ -34,23 +34,23 @@ typedef struct sthotel
 } sthotel;
 void clearConsoleLine()
 {
-    printf("\r");
     int i;
+    printf("\r");
     for (i = 0; i < 200; i++)
         printf(" ");
     printf("\r");
 }
-int addRooms(sthotel *hotel)
+void addRooms(sthotel *hotel)
 {
+    int first = true, i = hotel->roomCount, flag = false;
     printf("Вводите комнаты в формате:\n"
            "номер,этаж,класс,стоимость,количество людей\n");
-    int first = true, i = hotel->roomCount, flag = false;
 
     while (true)
     {
         int temp, error = 0, k = 0;
-        i = hotel->roomCount;
         char tempS[1000];
+        i = hotel->roomCount;
         if (flag)
         {
             if (!first)
@@ -69,8 +69,8 @@ int addRooms(sthotel *hotel)
         }
         if (first || askNY())
         {
-            first = false;
             int p = -1;
+            first = false;            
             if (!flag)
                 k = 5;
 
@@ -81,8 +81,10 @@ int addRooms(sthotel *hotel)
                 clearConsoleLine();
                 if (p == 0)
                 {
+                    int j;
+                    char c;
                     printf("Номер комнаты        <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -98,7 +100,6 @@ int addRooms(sthotel *hotel)
                     printf("Введите номер комнаты: ");
                     scanf("%s", tempS);
                     temp = stod(tempS);
-                    int j;
                     for (j = 0; j < hotel->roomCount; j++)
                         if (temp == hotel->room[j].number)
                             temp = err;
@@ -127,8 +128,9 @@ int addRooms(sthotel *hotel)
                 }
                 if (p == 1)
                 {
+                    char c;
                     printf("Этаж комнаты         <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -169,8 +171,9 @@ int addRooms(sthotel *hotel)
                 }
                 if (p == 2)
                 {
+                    char c;
                     printf("Класс комнаты        <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -207,8 +210,9 @@ int addRooms(sthotel *hotel)
                 }
                 if (p == 3)
                 {
+                    char c;
                     printf("Количество людей     <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -251,8 +255,9 @@ int addRooms(sthotel *hotel)
                 }
                 if (p == 4)
                 {
+                    char c;
                     printf("Стоимость комнаты    <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -311,16 +316,16 @@ int addRooms(sthotel *hotel)
         }
         else
             break;
-    }
+    }    
 }
 void clearHotel(sthotel *hotel)
 {
+    int i;
     strcpy(hotel->name, "");
     hotel->floors = 0;
     hotel->roomCount = 0;
     hotel->guestsCount = 0;
     hotel->emptyCount = 0;
-    int i;
     for (i = 0; i < 1000; i++)
     {
         strcpy(hotel->room[i].class, "");
@@ -340,14 +345,18 @@ void clearHotel(sthotel *hotel)
 }
 void Save(sthotel *hotel, int *saved)
 {
+    int i;
+    FILE *fp1;
+    FILE *fp2;
     if (!(*saved))
     {
+        char c;
         FILE *fp2 = fopen("guests.txt", "r");
         FILE *fp2c = fopen("backupGuests.txt", "w");
         FILE *fp1 = fopen("hotel.txt", "r");
         FILE *fp1c = fopen("backupHotel.txt", "w");
 
-        char c = fgetc(fp1);
+        c = fgetc(fp1);
         while (!feof(fp1))
         {
             putc(c, fp1c);
@@ -365,12 +374,11 @@ void Save(sthotel *hotel, int *saved)
         fclose(fp2c);
         *saved = true;
     }
-    FILE *fp1 = fopen("hotel.txt", "w");
+    fp1 = fopen("hotel.txt", "w");
     fprintf(fp1, "%s\n%d\n%d\n", hotel->name, hotel->floors, hotel->roomCount);
-    int i;
     for (i = 0; i < hotel->roomCount; i++)
         fprintf(fp1, "%s\n%d %d %d %d %d\n", hotel->room[i].class, hotel->room[i].cost, hotel->room[i].floor, hotel->room[i].number, hotel->room[i].peoples, hotel->room[i].empty);
-    FILE *fp2 = fopen("guests.txt", "w");
+    fp2 = fopen("guests.txt", "w");
     fprintf(fp2, "%d\n", hotel->guestsCount);
     for (i = 0; i < hotel->guestsCount; i++)
         fprintf(fp2, "%s\n%s\n%s\n%s\n%d\n%s\n%d\n",
@@ -387,9 +395,9 @@ void delLast(char *str)
 }
 void LoadHotel(sthotel *hotel, FILE *fp1)
 {
+    int i;
     hotel->emptyCount = 0;
     fgets(hotel->name, 254, fp1);
-    int i;
     delLast(hotel->name);
     fscanf(fp1, "%d %d\n", &hotel->floors, &hotel->roomCount);
     for (i = 0; i < hotel->roomCount; i++)
@@ -403,8 +411,8 @@ void LoadHotel(sthotel *hotel, FILE *fp1)
 }
 void LoadGuests(sthotel *hotel, FILE *fp2)
 {
+    int i;
     fscanf(fp2, "%d\n", &hotel->guestsCount);
-    int i, j;
     for (i = 0; i < hotel->guestsCount; i++)
     {
         fgets(hotel->guests[i].FIO, 254, fp2);
@@ -424,6 +432,7 @@ void LoadGuests(sthotel *hotel, FILE *fp2)
 }
 void addGuest(sthotel *hotel)
 {
+    int first = true, flag = false;
     if (hotel->emptyCount == 0)
     {
         printf("Все комнаты заняты\n");
@@ -431,7 +440,6 @@ void addGuest(sthotel *hotel)
     }
     printf("Вводите гостей в формате:\n"
            "ФИО,паспорт,телефон,дата заселения,дата выселения,номер комнаты\n");
-    int first = true, flag = false;
 
     while (true)
     {
@@ -455,8 +463,8 @@ void addGuest(sthotel *hotel)
         }
         if (first || askNY())
         {
-            first = false;
             int p = -1;
+            first = false;            
             if (!flag)
                 k = 6;
 
@@ -467,8 +475,9 @@ void addGuest(sthotel *hotel)
                 clearConsoleLine();
                 if (p == 0)
                 {
+                    char c;
                     printf("ФИО                  <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -505,8 +514,9 @@ void addGuest(sthotel *hotel)
                 }
                 else if (p == 1)
                 {
+                    char c;
                     printf("Паспорт              <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -543,8 +553,9 @@ void addGuest(sthotel *hotel)
                 }
                 else if (p == 2)
                 {
+                    char c;
                     printf("Телефон              <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -581,8 +592,9 @@ void addGuest(sthotel *hotel)
                 }
                 else if (p == 3)
                 {
+                    char c;
                     printf("Дата заселения       <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -619,8 +631,9 @@ void addGuest(sthotel *hotel)
                 }
                 else if (p == 4)
                 {
+                    char c;
                     printf("Дата выселения       <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -657,8 +670,10 @@ void addGuest(sthotel *hotel)
                 }
                 else if (p == 5)
                 {
+                    char c;
+                    int j,f;
                     printf("Номер комнаты        <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -671,7 +686,7 @@ void addGuest(sthotel *hotel)
                             break;
                         }
                     }
-                    int j, f = false;
+                    f = false;
                     printf("Свободные номера: ");
                     for (j = 0; j < hotel->roomCount; j++)
                         if (hotel->room[j].empty != 0)
@@ -767,7 +782,7 @@ void init(sthotel *hotel)
 }
 int myComp(char *str1, int d1, char *str2)
 {
-    int i = 0, j = 0, d2;
+    int i = 0, j = 0, d2, mnk, k;
     char *tempS;
     int temp;
     while (true)
@@ -787,18 +802,18 @@ int myComp(char *str1, int d1, char *str2)
         d2 = temp;
     }
 
-    int mnk = 1001, k;
+    mnk = 1001;
     for (i = 0; i <= d2 - d1; i++)
     {
         k = 0;
         for (j = 0; j < d1; j++)
         {
-            char c1 = str1[j];
+            char c1 = str1[j], c2;
             if (c1 >= 'A' && c1 <= 'Z')
                 c1 = c1 - 'A' + 'a';
             if (c1 >= 'А' && c1 <= 'Я')
                 c1 = c1 - 'А' + 'а';
-            char c2 = str2[j + i];
+            c2 = str2[j + i];
             if (c2 >= 'A' && c2 <= 'Z')
                 c2 = c2 - 'A' + 'a';
             if (c2 >= 'А' && c2 <= 'Я')
@@ -813,9 +828,9 @@ int myComp(char *str1, int d1, char *str2)
 }
 void delGuest(sthotel *hotel)
 {
+    int first = true, flag, p = -1;
     printf("Выберите поле по которому найдём гостя для выселения:\n");
 
-    int first = true, flag, p = -1;
     while (true)
     {
         int temp, error = 0;
@@ -834,13 +849,15 @@ void delGuest(sthotel *hotel)
             printf("(Нажимайте tab чтобы перейти к другому полю; Esc чтобы прервать выселение гостя)\n");
             while (flag)
             {
-                p = (p + 1) % 5;
                 int j;
+                p = (p + 1) % 5;
                 clearConsoleLine();
                 if (p == 0)
                 {
+                    char c;
+                    int min, d;
                     printf("ФИО                  <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -856,7 +873,8 @@ void delGuest(sthotel *hotel)
                     printf("Введите Фамилию Имя Отчество через пробел: ");
                     fflush(stdin);
                     gets(tempS);
-                    int min = 1001, d = 0;
+                    min = 1001;
+                    d = 0;
                     minp = 0;
                     while (true)
                     {
@@ -883,8 +901,10 @@ void delGuest(sthotel *hotel)
                 }
                 else if (p == 1)
                 {
+                    char c;
+                    int min, d;
                     printf("Паспорт              <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -900,7 +920,8 @@ void delGuest(sthotel *hotel)
                     printf("Введите серийный номер паспорта: ");
                     fflush(stdin);
                     gets(tempS);
-                    int min = 1001, d = 0;
+                    min = 1001;
+                    d = 0;
                     minp = 0;
                     while (true)
                     {
@@ -927,8 +948,10 @@ void delGuest(sthotel *hotel)
                 }
                 else if (p == 2)
                 {
+                    char c;
+                    int min, d;
                     printf("Телефон              <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -944,7 +967,8 @@ void delGuest(sthotel *hotel)
                     printf("Введите телефон гостя: ");
                     fflush(stdin);
                     gets(tempS);
-                    int min = 1001, d = 0;
+                    min = 1001;
+                    d = 0;
                     minp = 0;
                     while (true)
                     {
@@ -971,8 +995,10 @@ void delGuest(sthotel *hotel)
                 }
                 else if (p == 3)
                 {
+                    char c;
+                    int min, d;
                     printf("Дата заселения       <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -988,7 +1014,8 @@ void delGuest(sthotel *hotel)
                     printf("Введите дату заселения гостя: ");
                     fflush(stdin);
                     gets(tempS);
-                    int min = 1001, d = 0;
+                    min = 1001;
+                    d = 0;
                     minp = 0;
                     while (true)
                     {
@@ -1015,8 +1042,10 @@ void delGuest(sthotel *hotel)
                 }
                 else if (p == 4)
                 {
+                    char c;
+                    int min, d;
                     printf("Дата выселения       <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1032,7 +1061,8 @@ void delGuest(sthotel *hotel)
                     printf("Введите дату выселения гостя: ");
                     fflush(stdin);
                     gets(tempS);
-                    int min = 1001, d = 0;
+                    min = 1001;
+                    d = 0;
                     minp = 0;
                     while (true)
                     {
@@ -1065,7 +1095,8 @@ void delGuest(sthotel *hotel)
                    hotel->guests[minp].FIO, hotel->guests[minp].passport, hotel->guests[minp].phone, hotel->guests[minp].roomNumber, hotel->guests[minp].inDate, hotel->guests[minp].outDate);
             if (askNY())
             {
-                int i = minp;
+                int i = minp,j;
+                stguests temp;
                 hotel->emptyCount++;
                 hotel->room[hotel->guests[i].posRoom].empty++;
                 strcpy(hotel->guests[i].FIO, "");
@@ -1074,9 +1105,7 @@ void delGuest(sthotel *hotel)
                 strcpy(hotel->guests[i].inDate, "");
                 strcpy(hotel->guests[i].outDate, "");
                 hotel->guests[i].roomNumber = 0;
-                hotel->guests[i].posRoom = 0;
-                int j;
-                stguests temp;
+                hotel->guests[i].posRoom = 0;                                
                 for (j = 0; j < hotel->guestsCount; j++)
                     if (hotel->guests[j].roomNumber == 0)
                     {
@@ -1100,19 +1129,19 @@ void delGuest(sthotel *hotel)
 }
 void editRooms(sthotel *hotel, int i)
 {
-    printf("Выберите одно из полей для изменения:\n"
-           "номер,этаж,класс,стоимость,количество людей\n");
     int first = true;
+    printf("Выберите одно из полей для изменения:\n"
+           "номер,этаж,класс,стоимость,количество людей\n");    
     while (true)
     {
-        int temp, error = 0, flag = true;
+        int temp, flag = true;
         char tempS[1000];
         if (!first)
             printf("\nОтредактировать ещё комнату номер %d?\n", hotel->room[i].number);
         if (first || askNY())
         {
-            first = false;
             int p = -1;
+            first = false;            
 
             printf("(Нажимайте tab чтобы перейти к другому полю; Esc чтобы прервать редактирование комнаты)\n");
             while (flag)
@@ -1121,8 +1150,10 @@ void editRooms(sthotel *hotel, int i)
                 clearConsoleLine();
                 if (p == 0)
                 {
+                    char c;
+                    int j;
                     printf("Номер комнаты        <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1130,15 +1161,13 @@ void editRooms(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование комнаты?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
                     printf("Введите новый номер комнаты: ");
                     scanf("%s", tempS);
-                    temp = stod(tempS);
-                    int j;
+                    temp = stod(tempS);                    
                     for (j = 0; j < hotel->roomCount; j++)
                         if (hotel->room[j].number == temp)
                         {
@@ -1166,8 +1195,9 @@ void editRooms(sthotel *hotel, int i)
                 }
                 else if (p == 1)
                 {
+                    char c;
                     printf("Этаж комнаты         <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1175,8 +1205,7 @@ void editRooms(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование комнаты?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1200,8 +1229,9 @@ void editRooms(sthotel *hotel, int i)
                 }
                 else if (p == 2)
                 {
+                    char c;
                     printf("Класс комнаты        <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1209,8 +1239,7 @@ void editRooms(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование комнаты?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1233,8 +1262,9 @@ void editRooms(sthotel *hotel, int i)
                 }
                 else if (p == 3)
                 {
+                    char c;
                     printf("Количество людей     <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1242,8 +1272,7 @@ void editRooms(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование комнаты?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1269,8 +1298,9 @@ void editRooms(sthotel *hotel, int i)
                 }
                 else if (p == 4)
                 {
+                    char c;
                     printf("Стоимость комнаты    <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1278,8 +1308,7 @@ void editRooms(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование комнаты?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1309,9 +1338,9 @@ void editRooms(sthotel *hotel, int i)
 }
 int findGuest(sthotel *hotel)
 {
-    printf("Выберите поле по которому найдём гостя для изменения:\n");
-
     int flag, p = -1, first = true;
+    printf("Выберите поле по которому найдём гостя для изменения:\n");
+    
     while (true)
     {
         int temp, error = 0, minp = 0;
@@ -1326,14 +1355,16 @@ int findGuest(sthotel *hotel)
         printf("(Нажимайте tab чтобы перейти к другому полю; Esc чтобы прервать поиск гостя)\n");
         while (flag)
         {
-            first = false;
-            p = (p + 1) % 5;
             int j;
+            first = false;            
+            p = (p + 1) % 5;            
             clearConsoleLine();
             if (p == 0)
             {
+                char c;
+                int min,d;
                 printf("ФИО                      <-");
-                char c = getch();
+                c = getch();
                 if (c == 9)
                     continue;
                 clearConsoleLine();
@@ -1349,7 +1380,8 @@ int findGuest(sthotel *hotel)
                 printf("Введите Фамилию Имя Отчество через пробел: ");
                 fflush(stdin);
                 gets(tempS);
-                int min = 1001, d = 0;
+                min = 1001; 
+                d = 0;
                 minp = 0;
                 while (true)
                 {
@@ -1376,8 +1408,10 @@ int findGuest(sthotel *hotel)
             }
             else if (p == 1)
             {
+                char c;
+                int min,d;
                 printf("Паспорт                  <-");
-                char c = getch();
+                c = getch();
                 if (c == 9)
                     continue;
                 clearConsoleLine();
@@ -1393,7 +1427,8 @@ int findGuest(sthotel *hotel)
                 printf("Введите серийный номер паспорта: ");
                 fflush(stdin);
                 gets(tempS);
-                int min = 1001, d = 0;
+                min = 1001; 
+                d = 0;
                 minp = 0;
                 while (true)
                 {
@@ -1420,8 +1455,10 @@ int findGuest(sthotel *hotel)
             }
             else if (p == 2)
             {
+                char c;
+                int min,d;
                 printf("Телефон                  <-");
-                char c = getch();
+                c = getch();
                 if (c == 9)
                     continue;
                 clearConsoleLine();
@@ -1437,7 +1474,8 @@ int findGuest(sthotel *hotel)
                 printf("Введите телефон гостя: ");
                 fflush(stdin);
                 gets(tempS);
-                int min = 1001, d = 0;
+                min = 1001; 
+                d = 0;
                 minp = 0;
                 while (true)
                 {
@@ -1464,8 +1502,10 @@ int findGuest(sthotel *hotel)
             }
             else if (p == 3)
             {
+                char c;
+                int min,d;
                 printf("Дата заселения           <-");
-                char c = getch();
+                c = getch();
                 if (c == 9)
                     continue;
                 clearConsoleLine();
@@ -1481,7 +1521,8 @@ int findGuest(sthotel *hotel)
                 printf("Введите дату заселения гостя: ");
                 fflush(stdin);
                 gets(tempS);
-                int min = 1001, d = 0;
+                min = 1001; 
+                d = 0;
                 minp = 0;
                 while (true)
                 {
@@ -1508,8 +1549,10 @@ int findGuest(sthotel *hotel)
             }
             else if (p == 4)
             {
+                char c;
+                int min,d;
                 printf("Дата выселения           <-");
-                char c = getch();
+                c = getch();
                 if (c == 9)
                     continue;
                 clearConsoleLine();
@@ -1525,7 +1568,8 @@ int findGuest(sthotel *hotel)
                 printf("Введите дату выселения гостя: ");
                 fflush(stdin);
                 gets(tempS);
-                int min = 1001, d = 0;
+                min = 1001; 
+                d = 0;
                 minp = 0;
                 while (true)
                 {
@@ -1570,20 +1614,20 @@ int findGuest(sthotel *hotel)
 }
 void editGuest(sthotel *hotel, int i)
 {
+    int first = true;
     printf("Ввыберите поле для изменения у гостя %s:\n"
            "ФИО,паспорт,телефон,дата заселения,дата выселения,номер комнаты\n",
-           hotel->guests[i].FIO);
-    int first = true;
+           hotel->guests[i].FIO);    
     while (true)
     {
-        int temp, error = 0;
+        int temp;
         char tempS[1000];
         if (!first)
             printf("\nОтредктировать ещё гостя %s?\n", hotel->guests[i].FIO);
         if (first || askNY())
         {
-            first = false;
             int p = -1, flag = true;
+            first = false;            
             printf("(Нажимайте tab чтобы перейти к другому полю; Esc чтобы прервать редактирование гостя)\n");
             while (flag)
             {
@@ -1591,8 +1635,9 @@ void editGuest(sthotel *hotel, int i)
                 clearConsoleLine();
                 if (p == 0)
                 {
+                    char c;
                     printf("ФИО                  <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1600,8 +1645,7 @@ void editGuest(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостя?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1624,8 +1668,9 @@ void editGuest(sthotel *hotel, int i)
                 }
                 else if (p == 1)
                 {
+                    char c;
                     printf("Паспорт              <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1633,8 +1678,7 @@ void editGuest(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостя?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1657,8 +1701,9 @@ void editGuest(sthotel *hotel, int i)
                 }
                 else if (p == 2)
                 {
+                    char c;
                     printf("Телефон              <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1666,8 +1711,7 @@ void editGuest(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостя?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1690,8 +1734,9 @@ void editGuest(sthotel *hotel, int i)
                 }
                 else if (p == 3)
                 {
+                    char c;
                     printf("Дата заселения       <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1699,8 +1744,7 @@ void editGuest(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостя?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1723,8 +1767,9 @@ void editGuest(sthotel *hotel, int i)
                 }
                 else if (p == 4)
                 {
+                    char c;
                     printf("Дата выселения       <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1732,8 +1777,7 @@ void editGuest(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать изменение гостя?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1756,8 +1800,10 @@ void editGuest(sthotel *hotel, int i)
                 }
                 else if (p == 5)
                 {
+                    char c;
+                    int j,f;
                     printf("Номер комнаты        <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1765,12 +1811,11 @@ void editGuest(sthotel *hotel, int i)
                     {
                         printf("\nВы уверены что хотите прервать заселение гостя?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
-                    int j, f = false;
+                    f = false;
                     printf("Свободные номера: ");
                     for (j = 0; j < hotel->roomCount; j++)
                         if (hotel->room[j].empty != 0)
@@ -1818,21 +1863,21 @@ void editGuest(sthotel *hotel, int i)
 }
 void editHotel(sthotel *hotel)
 {
+    int first = true, flag = false;
     printf("Выберите поле для изменения:\n"
            "название гостиницы, комната, гость\n");
-    int first = true, flag = false;
 
     while (true)
     {
-        int temp, error = 0;
+        int temp;
         char tempS[1000];
         if (!first)
             printf("\nОтредактировать ещё гостиницу?\n");
 
         if (first || askNY())
         {
-            first = false;
             int p = -1;
+            first = false;
             flag = true;
             printf("(Нажимайте tab чтобы перейти к другому полю; Esc чтобы прервать редактирование гостиницы)\n");
             while (flag)
@@ -1841,8 +1886,9 @@ void editHotel(sthotel *hotel)
                 clearConsoleLine();
                 if (p == 0)
                 {
+                    char c;
                     printf("Название гостиницы   <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1850,8 +1896,7 @@ void editHotel(sthotel *hotel)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостиницы?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1869,8 +1914,10 @@ void editHotel(sthotel *hotel)
                 }
                 else if (p == 1)
                 {
+                    char c;
+                    int j,f;
                     printf("Комната              <-");
-                    char c = getch();
+                    c = getch();                    
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1878,13 +1925,12 @@ void editHotel(sthotel *hotel)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостиницы?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
                     printf("Номера комнат гостиницы: ");
-                    int j, f = false;
+                    f = false;
                     for (j = 0; j < hotel->roomCount; j++)
                     {
                         if (f)
@@ -1914,8 +1960,9 @@ void editHotel(sthotel *hotel)
                 }
                 else if (p == 2)
                 {
+                    char c;
                     printf("Гость                <-");
-                    char c = getch();
+                    c = getch();
                     if (c == 9)
                         continue;
                     clearConsoleLine();
@@ -1923,8 +1970,7 @@ void editHotel(sthotel *hotel)
                     {
                         printf("\nВы уверены что хотите прервать редактирование гостиницы?\n");
                         if (askNY())
-                        {
-                            error = err;
+                        {                            
                             break;
                         }
                     }
@@ -1945,26 +1991,29 @@ void editHotel(sthotel *hotel)
 }
 int main()
 {
+    int saved;
+    FILE *fp1,*fp2;
+    sthotel hotel;
     setlocale(LC_ALL, "ru_RU.CP866");
     keybd_event(VK_MENU, 0x38, 0, 0);
     keybd_event(VK_RETURN, 0x1c, 0, 0);
     keybd_event(VK_RETURN, 0x1c, KEYEVENTF_KEYUP, 0);
     keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
-    FILE *fp1 = fopen("hotel.txt", "r");
-    FILE *fp2 = fopen("guests.txt", "r");
-    sthotel hotel;
+    fp1 = fopen("hotel.txt", "r");
+    fp2 = fopen("guests.txt", "r");    
     clearHotel(&hotel);
     printf("Не забудьте поменять раскладку на русскую.\n");
-    int saved = true;
+    saved = true;
     if (fp1 == NULL && fp2 == NULL)
     {
         printf("\nПохоже на то, что это Ваш первый запуск.\n"
                "Хотите ли Вы инициализировать данные о гостинице?\n");
         if (askNY())
         {
+            FILE *fp1,*fp2;
             init(&hotel);
-            FILE *fp1 = fopen("hotel.txt", "w");
-            FILE *fp2 = fopen("guests.txt", "w");
+            fp1 = fopen("hotel.txt", "w");
+            fp2 = fopen("guests.txt", "w");
             fclose(fp1);
             fclose(fp2);
             Save(&hotel, &saved);
@@ -1987,6 +2036,7 @@ int main()
     fclose(fp2);
     while (true)
     {
+        char c;
         printf("\n**************************\n");
         printf("(Esc завершить выполнение программы; Ctrl+s сохранить)\n");
         printf("\n1. Вывести данные о комнатах\n");
@@ -1999,7 +2049,7 @@ int main()
         printf("8. Вернуться к последнему сохраниению\n");
         printf("9. Cбросить до заводских настроек\n");
         printf("**************************\n");
-        char c = getch();
+        c = getch();
         if (c == 19)
         {
             Save(&hotel, &saved);
@@ -2007,17 +2057,17 @@ int main()
         }
         else if (c == '1')
         {
-            printf("Ваша великолепная %d этажная гостиница '%s' имеет %d комнат(%d свободных мест):\n",
-                   hotel.floors, hotel.name, hotel.roomCount, hotel.emptyCount);
             int i;
+            printf("Ваша великолепная %d этажная гостиница '%s' имеет %d комнат(%d свободных мест):\n",
+                   hotel.floors, hotel.name, hotel.roomCount, hotel.emptyCount);            
             for (i = 0; i < hotel.roomCount; i++)
                 printf("%d. На %d этаже комната номер %d класса '%s' стоимостью %d у.е. рассчитанную на %d человек(%d мест свободно)\n",
                        i + 1, hotel.room[i].floor, hotel.room[i].number, hotel.room[i].class, hotel.room[i].cost, hotel.room[i].peoples, hotel.room[i].empty);
         }
         else if (c == '2')
         {
-            printf("В Вашу чудеснейшую гостиницу уже заселилось %d человек:\n", hotel.guestsCount);
             int i;
+            printf("В Вашу чудеснейшую гостиницу уже заселилось %d человек:\n", hotel.guestsCount);            
             for (i = 0; i < hotel.guestsCount; i++)
                 printf("%d. Уважаемый %s с паспортным номером %s и телефонным номером %s\n"
                        "заселился %s в комнату %d и выселится %s\n",
